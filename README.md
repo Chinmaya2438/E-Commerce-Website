@@ -225,12 +225,6 @@ Database: MongoDB Atlas
 
 ---
 
-# 📸 Screenshots
-
-(Add screenshots here)
-
----
-
 # 📌 Future Improvements
 
 * Wishlist feature
