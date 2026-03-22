@@ -18,6 +18,7 @@ import paymentRoutes from "./routes/paymentRoutes.js";
 dotenv.config();
 
 const app = express();
+app.set("trust proxy", 1); // Crucial for Render deployment logs & rate limiters
 
 // Middleware
 app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" })); // Allows external image loading
