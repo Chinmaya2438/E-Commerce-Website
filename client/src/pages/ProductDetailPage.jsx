@@ -131,6 +131,10 @@ const ProductDetailPage = () => {
               src={product.image?.url || "https://via.placeholder.com/600x600?text=Product"}
               alt={product.name}
               className="w-full h-full object-cover"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = "https://via.placeholder.com/600x600?text=Product";
+              }}
             />
           </div>
         </div>

@@ -40,6 +40,10 @@ const ProductCard = ({ product }) => {
           src={product.image?.url || "https://via.placeholder.com/400x400?text=Product"}
           alt={product.name}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src = "https://via.placeholder.com/400x400?text=Product";
+          }}
         />
         {!isAdmin && (
           <button
