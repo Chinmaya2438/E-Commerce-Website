@@ -52,14 +52,7 @@ app.use("/api/cart", cartRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/payment", paymentRoutes);
 
-if (process.env.NODE_ENV === "production") {
-  const __dirname = path.resolve();
-  app.use(express.static(path.join(__dirname, "../client/dist")));
-
-  app.get("*", (req, res) =>
-    res.sendFile(path.resolve(__dirname, "../client", "dist", "index.html"))
-  );
-}
+// Backend operates purely as a Microservice API Engine
 
 // Error handling
 app.use(notFound);
