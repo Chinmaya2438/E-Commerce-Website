@@ -50,6 +50,7 @@ export const getMyOrders = () => API.get("/orders/my");
 export const getAllOrders = () => API.get("/orders");
 export const updateOrderStatus = (id, data) => API.put(`/orders/${id}`, data);
 export const cancelOrder = (id) => API.put(`/orders/${id}/cancel`);
+export const getInvoice = (id) => API.get(`/orders/${id}/invoice`, { responseType: "blob" });
 
 // Payment
 export const createStripeSession = (data) => API.post("/payment/create-session", data);

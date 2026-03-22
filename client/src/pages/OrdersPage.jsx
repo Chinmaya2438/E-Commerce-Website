@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { getMyOrders, cancelOrder, verifyStripeSession } from "../services/api";
+import { getMyOrders, cancelOrder, verifyStripeSession, getInvoice } from "../services/api";
 import LoadingSpinner from "../components/LoadingSpinner";
 import toast from "react-hot-toast";
 import { HiOutlineClipboardList } from "react-icons/hi";
@@ -53,6 +53,22 @@ const OrdersPage = () => {
       setOrders(orders.map(o => o._id === orderId ? { ...o, status: 'cancelled' } : o));
     } catch (error) {
       toast.error(error.response?.data?.message || error.message || "Failed to cancel order");
+    }
+  };
+
+  const handleDownloadInvoice = async (orderId) => {
+    try {
+      toast.loading("Generating your secure PDF...", { id: "pdf" });
+      const { data } = await getInvoice(orderId);
+      const url = window.URL.createObjectURL(new Blob([data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `Invoice_${orderId}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      toast.success("PDF Invoice successfully retrieved!", { id: "pdf" });
+    } catch (error) {
+      toast.error("Failed to mathematically generate the PDF document.", { id: "pdf" });
     }
   };
 
@@ -117,6 +133,15 @@ const OrdersPage = () => {
                       className="text-xs font-bold text-red-500 hover:text-red-700 transition-colors ml-1 bg-red-50 px-2 py-1 rounded shadow-sm border border-red-100"
                     >
                       Cancel Order
+                    </button>
+                  )}
+                  {order.status !== "cancelled" && (
+                    <button 
+                      onClick={() => handleDownloadInvoice(order._id)}
+                      className="text-xs font-bold text-primary-600 hover:text-primary-800 transition-colors ml-2 bg-primary-50 px-3 py-1 rounded shadow-sm border border-primary-100 flex items-center gap-1"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                      Get PDF Receipt
                     </button>
                   )}
                 </div>

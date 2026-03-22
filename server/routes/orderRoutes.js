@@ -5,6 +5,7 @@ import {
   getMyOrders,
   updateOrderStatus,
   cancelOrder,
+  downloadInvoice,
 } from "../controllers/orderController.js";
 import authMiddleware from "../middleware/authMiddleware.js";
 import adminMiddleware from "../middleware/adminMiddleware.js";
@@ -16,6 +17,7 @@ router.use(authMiddleware);
 router.post("/", createOrder);
 router.get("/my", getMyOrders);
 router.get("/", adminMiddleware, getAllOrders);
+router.get("/:id/invoice", downloadInvoice);
 router.put("/:id/cancel", cancelOrder);
 router.put("/:id", adminMiddleware, updateOrderStatus);
 

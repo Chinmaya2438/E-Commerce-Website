@@ -58,8 +58,8 @@ const Footer = () => {
                 <HiOutlineMail className="w-4 h-4" />
                 <span>support@shopverse.com</span>
               </li>
-              <li>Mumbai, India</li>
-              <li>+91 98765 43210</li>
+              <li>Junagarh, Kalahandi</li>
+              <li>+91 9876543210</li>
             </ul>
           </div>
         </div>
