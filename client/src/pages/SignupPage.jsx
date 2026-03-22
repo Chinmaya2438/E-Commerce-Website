@@ -1,13 +1,15 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { HiOutlineUser, HiOutlineMail, HiOutlineLockClosed } from "react-icons/hi";
+import { HiOutlineUser, HiOutlineMail, HiOutlineLockClosed, HiOutlineEye, HiOutlineEyeOff } from "react-icons/hi";
 
 const SignupPage = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const { signup } = useAuth();
@@ -92,13 +94,19 @@ const SignupPage = () => {
                 <HiOutlineLockClosed className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-dark-400" />
                 <input
                   id="signup-password"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Min 6 characters"
-                  className="input-field pl-10"
+                  className="input-field pl-10 pr-10"
                   required
                 />
+                <div 
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer text-dark-400 hover:text-dark-600"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <HiOutlineEyeOff className="h-5 w-5" /> : <HiOutlineEye className="h-5 w-5" />}
+                </div>
               </div>
             </div>
 
@@ -110,13 +118,19 @@ const SignupPage = () => {
                 <HiOutlineLockClosed className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-dark-400" />
                 <input
                   id="signup-confirm-password"
-                  type="password"
+                  type={showConfirmPassword ? "text" : "password"}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Re-enter password"
-                  className="input-field pl-10"
+                  className="input-field pl-10 pr-10"
                   required
                 />
+                <div 
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer text-dark-400 hover:text-dark-600"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  {showConfirmPassword ? <HiOutlineEyeOff className="h-5 w-5" /> : <HiOutlineEye className="h-5 w-5" />}
+                </div>
               </div>
             </div>
 

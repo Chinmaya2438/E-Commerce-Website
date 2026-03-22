@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { HiOutlineMail, HiOutlineLockClosed } from "react-icons/hi";
+import { HiOutlineMail, HiOutlineLockClosed, HiOutlineEye, HiOutlineEyeOff } from "react-icons/hi";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -47,20 +48,31 @@ const LoginPage = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-dark-700 mb-1.5">
-                Password
-              </label>
+              <div className="flex justify-between items-center mb-1.5">
+                <label className="block text-sm font-medium text-dark-700">
+                  Password
+                </label>
+                <Link to="/forgot-password" className="text-sm text-primary-600 hover:text-primary-700 font-medium">
+                  Forgot password?
+                </Link>
+              </div>
               <div className="relative">
                 <HiOutlineLockClosed className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-dark-400" />
                 <input
                   id="login-password"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="input-field pl-10"
+                  className="input-field pl-10 pr-10"
                   required
                 />
+                <div 
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer text-dark-400 hover:text-dark-600"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <HiOutlineEyeOff className="h-5 w-5" /> : <HiOutlineEye className="h-5 w-5" />}
+                </div>
               </div>
             </div>
 
