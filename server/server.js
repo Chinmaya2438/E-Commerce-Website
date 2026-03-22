@@ -33,7 +33,10 @@ app.use("/api", limiter);
 
 // Secure CORS
 const corsOptions = {
-  origin: process.env.NODE_ENV === "production" ? process.env.FRONTEND_URL || false : true,
+  origin: [
+    "http://localhost:5173",
+    "https://e-commerce-frontend-self-eight.vercel.app"
+  ],
   credentials: true,
 };
 app.use(cors(corsOptions));
