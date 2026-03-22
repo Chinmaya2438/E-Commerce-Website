@@ -52,6 +52,7 @@ const ProductDetailPage = () => {
   };
 
   useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
     fetchProduct();
   }, [id]);
 
