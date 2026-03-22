@@ -5,9 +5,9 @@ const sendEmail = async (options) => {
 
   if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
     transporterOpts = {
-      host: process.env.EMAIL_HOST || "smtp.gmail.com",
-      port: 465, // Force Port 465 to prevent .env / Render setting strict SSL collisions
-      secure: true,
+      host: process.env.EMAIL_HOST || "smtp.sendgrid.net",
+      port: process.env.EMAIL_PORT || 587,
+      secure: process.env.EMAIL_PORT == 465 ? true : false,
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
