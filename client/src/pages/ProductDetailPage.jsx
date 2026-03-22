@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getProductById, createProductReview } from "../services/api";
+import { getProductById, createProductReview, getProducts } from "../services/api";
 import toast from "react-hot-toast";
 import { useCart } from "../context/CartContext";
 import { useWishlist } from "../context/WishlistContext";
@@ -15,6 +15,7 @@ import {
   HiPlus,
   HiOutlineArrowLeft,
 } from "react-icons/hi";
+import ProductCard from "../components/ProductCard";
 
 const ProductDetailPage = () => {
   const { id } = useParams();
@@ -25,6 +26,7 @@ const ProductDetailPage = () => {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
+  const [relatedProducts, setRelatedProducts] = useState([]);
 
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
@@ -34,6 +36,14 @@ const ProductDetailPage = () => {
     try {
       const { data } = await getProductById(id);
       setProduct(data);
+      if (data.category) {
+        const related = await getProducts({ category: data.category, limit: 5 });
+        if (related.data && related.data.products) {
+          setRelatedProducts(
+            related.data.products.filter((p) => p._id !== data._id).slice(0, 4)
+          );
+        }
+      }
     } catch (error) {
       console.error(error);
     } finally {
@@ -352,6 +362,22 @@ const ProductDetailPage = () => {
           </div>
         </div>
       </div>
+
+      {/* --- You May Also Like Engine --- */}
+      {relatedProducts.length > 0 && (
+        <div className="mt-20 border-t border-dark-100 pt-16">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-dark-900 tracking-tight">
+              You May Also Like
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {relatedProducts.map((p) => (
+              <ProductCard key={p._id} product={p} />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
