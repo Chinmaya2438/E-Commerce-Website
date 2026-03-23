@@ -77,7 +77,12 @@ const ManageOrdersPage = () => {
                   </div>
                   <div>
                     <span className="text-dark-500 block">Total</span>
-                    <span className="font-bold">₹{order.totalPrice?.toLocaleString()}</span>
+                    <span className="font-bold block">₹{order.totalPrice?.toLocaleString()}</span>
+                    {order.discountAmount > 0 && (
+                      <span className="text-xs text-emerald-600 block mt-0.5 font-medium bg-emerald-50 px-1.5 py-0.5 rounded-md inline-block">
+                        Coupon: -₹{order.discountAmount.toLocaleString()} ({order.couponCode})
+                      </span>
+                    )}
                   </div>
                   <div>
                     <span className="text-dark-500 block">Date</span>
