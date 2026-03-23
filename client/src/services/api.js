@@ -22,6 +22,8 @@ export const loginUser = (data) => API.post("/auth/login", data);
 export const getProfile = () => API.get("/auth/profile");
 export const forgotPassword = (data) => API.post("/auth/forgot-password", data);
 export const resetPassword = (token, data) => API.put(`/auth/reset-password/${token}`, data);
+export const getAllUsers = () => API.get("/auth/users");
+export const deleteUser = (id) => API.delete(`/auth/users/${id}`);
 
 // Products
 export const getProducts = (params) => API.get("/products", { params });
@@ -55,5 +57,11 @@ export const getInvoice = (id) => API.get(`/orders/${id}/invoice`, { responseTyp
 // Payment
 export const createStripeSession = (data) => API.post("/payment/create-session", data);
 export const verifyStripeSession = (data) => API.post("/payment/verify-session", data);
+
+// Coupons
+export const getCoupons = () => API.get("/coupons");
+export const createCoupon = (data) => API.post("/coupons", data);
+export const deleteCoupon = (id) => API.delete(`/coupons/${id}`);
+export const applyCoupon = (data) => API.post("/coupons/apply", data);
 
 export default API;

@@ -121,6 +121,11 @@ const OrdersPage = () => {
                     <span className="font-bold text-dark-900">
                       ₹{order.totalPrice?.toLocaleString()}
                     </span>
+                    {order.discountAmount > 0 && (
+                      <span className="text-xs text-emerald-600 block mt-0.5 font-medium bg-emerald-50 px-1.5 py-0.5 rounded-md inline-block">
+                        Saved ₹{order.discountAmount.toLocaleString()} ({order.couponCode})
+                      </span>
+                    )}
                   </div>
                 </div>
                 <div className="flex items-center gap-3">

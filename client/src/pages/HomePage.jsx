@@ -41,7 +41,16 @@ const HomePage = () => {
     { icon: HiOutlineShoppingBag, title: "Easy Returns", desc: "30-day return policy" },
   ];
 
-  const categoryIcons = ["🖥️", "👗", "🏠", "📱", "🎮", "📚", "🏋️", "🎨"];
+  const categoryIconMap = {
+    "Books & Stationery": "📚",
+    "Electronics": "🖥️",
+    "Fashion": "👗",
+    "Home & Lifestyle": "🏠",
+    "Sports & Outdoors": "⚽",
+    "Gaming": "🎮",
+    "Fitness": "🏋️",
+    "Art": "🎨"
+  };
 
   if (loading) return <LoadingSpinner size="lg" />;
 
@@ -108,14 +117,14 @@ const HomePage = () => {
               </Link>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-              {categories.slice(0, 8).map((cat, i) => (
+              {categories.slice(0, 8).map((cat) => (
                 <Link
                   key={cat}
                   to={`/products?category=${encodeURIComponent(cat)}`}
                   className="card p-6 text-center group hover:border-primary-200 hover:shadow-md"
                 >
                   <span className="text-3xl mb-3 block">
-                    {categoryIcons[i % categoryIcons.length]}
+                    {categoryIconMap[cat] || "🛍️"}
                   </span>
                   <span className="text-sm font-semibold text-dark-800 group-hover:text-primary-600 transition-colors">
                     {cat}

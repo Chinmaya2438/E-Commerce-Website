@@ -4,7 +4,7 @@ import { cloudinary } from "../config/cloudinary.js";
 // GET /api/products — search, filter, sort, paginate
 export const getProducts = async (req, res) => {
   try {
-    const { search, category, sort, page = 1, limit = 12 } = req.query;
+    const { search, category, sort, priceRange, page = 1, limit = 12 } = req.query;
     const query = {};
 
     if (search) {
@@ -37,6 +37,14 @@ export const getProducts = async (req, res) => {
 
     if (category) {
       query.category = category;
+    }
+
+    if (priceRange) {
+      if (priceRange === "0-5000") query.price = { $lte: 5000 };
+      else if (priceRange === "5000-10000") query.price = { $gte: 5000, $lte: 10000 };
+      else if (priceRange === "10000-20000") query.price = { $gte: 10000, $lte: 20000 };
+      else if (priceRange === "20000-40000") query.price = { $gte: 20000, $lte: 40000 };
+      else if (priceRange === "40000+") query.price = { $gte: 40000 };
     }
 
     let sortOption = { createdAt: -1 };

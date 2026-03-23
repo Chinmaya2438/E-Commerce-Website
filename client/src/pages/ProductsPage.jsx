@@ -14,6 +14,7 @@ const ProductsPage = () => {
 
   const [search, setSearch] = useState(searchParams.get("search") || "");
   const [category, setCategory] = useState(searchParams.get("category") || "");
+  const [priceRange, setPriceRange] = useState(searchParams.get("priceRange") || "");
   const [sort, setSort] = useState(searchParams.get("sort") || "newest");
   const [page, setPage] = useState(parseInt(searchParams.get("page")) || 1);
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -46,6 +47,7 @@ const ProductsPage = () => {
         const params = { page, limit: 12, sort };
         if (search) params.search = search;
         if (category) params.category = category;
+        if (priceRange) params.priceRange = priceRange;
 
         const { data } = await getProducts(params);
         setProducts(data.products);
@@ -62,19 +64,21 @@ const ProductsPage = () => {
     const params = {};
     if (search) params.search = search;
     if (category) params.category = category;
+    if (priceRange) params.priceRange = priceRange;
     if (sort) params.sort = sort;
     if (page > 1) params.page = page;
     setSearchParams(params);
-  }, [search, category, sort, page]);
+  }, [search, category, priceRange, sort, page]);
 
   const clearFilters = () => {
     setSearch("");
     setCategory("");
+    setPriceRange("");
     setSort("newest");
     setPage(1);
   };
 
-  const hasFilters = search || category || sort !== "newest";
+  const hasFilters = search || category || priceRange || sort !== "newest";
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in">
@@ -155,6 +159,28 @@ const ProductsPage = () => {
               </select>
             </div>
 
+            {/* Price Filter */}
+            <div className="mb-5">
+              <label className="text-sm font-medium text-dark-700 block mb-2">
+                Price
+              </label>
+              <select
+                value={priceRange}
+                onChange={(e) => {
+                  setPriceRange(e.target.value);
+                  setPage(1);
+                }}
+                className="input-field py-2 text-sm"
+              >
+                <option value="">All Prices</option>
+                <option value="0-5000">Under ₹5,000</option>
+                <option value="5000-10000">₹5,000 - ₹10,000</option>
+                <option value="10000-20000">₹10,000 - ₹20,000</option>
+                <option value="20000-40000">₹20,000 - ₹40,000</option>
+                <option value="40000+">Over ₹40,000</option>
+              </select>
+            </div>
+
             {/* Categories */}
             <div>
               <label className="text-sm font-medium text-dark-700 block mb-2">
@@ -212,6 +238,19 @@ const ProductsPage = () => {
                 <span className="badge bg-primary-50 text-primary-700 px-3 py-1 flex items-center gap-1">
                   {category}
                   <button onClick={() => setCategory("")}>
+                    <HiOutlineX className="w-3 h-3" />
+                  </button>
+                </span>
+              )}
+              {priceRange && (
+                <span className="badge bg-primary-50 text-primary-700 px-3 py-1 flex items-center gap-1">
+                  Price: {
+                    priceRange === "0-5000" ? "Under ₹5,000" :
+                    priceRange === "5000-10000" ? "₹5k-₹10k" :
+                    priceRange === "10000-20000" ? "₹10k-₹20k" :
+                    priceRange === "20000-40000" ? "₹20k-₹40k" : "Over ₹40k"
+                  }
+                  <button onClick={() => { setPriceRange(""); setPage(1); }}>
                     <HiOutlineX className="w-3 h-3" />
                   </button>
                 </span>

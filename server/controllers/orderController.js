@@ -1,11 +1,12 @@
 import Order from "../models/Order.js";
 import Cart from "../models/Cart.js";
+import Coupon from "../models/Coupon.js";
 import PDFDocument from "pdfkit";
 
 // POST /api/orders
 export const createOrder = async (req, res) => {
   try {
-    const { shippingAddress } = req.body;
+    const { shippingAddress, couponCode } = req.body;
 
     if (!shippingAddress) {
       return res.status(400).json({ message: "Shipping address is required" });
@@ -33,11 +34,27 @@ export const createOrder = async (req, res) => {
       0
     );
 
+    let finalPrice = totalPrice;
+    let appliedDiscountAmount = 0;
+
+    if (couponCode) {
+      const coupon = await Coupon.findOne({ code: couponCode.toUpperCase(), isActive: true });
+      if (coupon && new Date(coupon.expiresAt) > new Date()) {
+        const discountAmount = coupon.discountType === "percentage" 
+          ? (totalPrice * coupon.discountValue) / 100 
+          : coupon.discountValue;
+        appliedDiscountAmount = Math.min(totalPrice, discountAmount);
+        finalPrice = Math.max(0, totalPrice - appliedDiscountAmount);
+      }
+    }
+
     const order = await Order.create({
       user: req.user._id,
       items: orderItems,
       shippingAddress,
-      totalPrice,
+      totalPrice: finalPrice,
+      couponCode: appliedDiscountAmount > 0 ? couponCode.toUpperCase() : undefined,
+      discountAmount: appliedDiscountAmount,
     });
 
     // Clear cart after order
@@ -233,19 +250,28 @@ export const downloadInvoice = async (req, res) => {
     checkPageWrap(100);
     yPos += 10;
     
-    doc.fontSize(10).fillColor("#888888").text("SUBTOTAL", 380, yPos);
-    doc.fillColor("#333333").text(`Rs. ${order.totalPrice.toLocaleString("en-IN")}`, 480, yPos);
+    const subTotal = order.totalPrice + (order.discountAmount || 0);
+
+    doc.fontSize(10).fillColor("#888888").text("SUBTOTAL", 330, yPos);
+    doc.fillColor("#333333").text(`Rs. ${subTotal.toLocaleString("en-IN")}`, 450, yPos, { width: 90, align: "right" });
     
-    yPos += 20;
-    doc.fillColor("#888888").text("TAX/SHIPPING", 380, yPos);
-    doc.fillColor("#333333").text("Rs. 0.00", 480, yPos);
+    if (order.discountAmount && order.discountAmount > 0) {
+      yPos += 20;
+      const displayCode = order.couponCode.length > 12 ? order.couponCode.substring(0, 10) + "..." : order.couponCode;
+      doc.fillColor("#16a34a").text(`DISCOUNT (${displayCode})`, 330, yPos);
+      doc.text(`-Rs. ${order.discountAmount.toLocaleString("en-IN")}`, 450, yPos, { width: 90, align: "right" });
+    }
 
     yPos += 20;
-    doc.moveTo(380, yPos).lineTo(545, yPos).strokeColor("#000000").lineWidth(2).stroke();
+    doc.fillColor("#888888").text("TAX/SHIPPING", 330, yPos);
+    doc.fillColor("#333333").text("Rs. 0.00", 450, yPos, { width: 90, align: "right" });
+
+    yPos += 20;
+    doc.moveTo(330, yPos).lineTo(545, yPos).strokeColor("#000000").lineWidth(2).stroke();
     
     yPos += 10;
-    doc.fontSize(12).fillColor("#000000").text("GRAND TOTAL", 350, yPos, { bold: true });
-    doc.fontSize(14).text(`Rs. ${order.totalPrice.toLocaleString("en-IN")}`, 460, yPos - 2, { bold: true });
+    doc.fontSize(12).fillColor("#000000").text("GRAND TOTAL", 300, yPos, { bold: true });
+    doc.fontSize(14).text(`Rs. ${order.totalPrice.toLocaleString("en-IN")}`, 420, yPos - 2, { width: 120, align: "right", bold: true });
 
     // --- FOOTER ---
     const footerY = doc.page.height - 70;

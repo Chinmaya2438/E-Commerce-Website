@@ -26,6 +26,8 @@ import DashboardPage from "./pages/admin/DashboardPage";
 import AddProductPage from "./pages/admin/AddProductPage";
 import EditProductPage from "./pages/admin/EditProductPage";
 import ManageOrdersPage from "./pages/admin/ManageOrdersPage";
+import ManageUsersPage from "./pages/admin/ManageUsersPage";
+import ManageCouponsPage from "./pages/admin/ManageCouponsPage";
 
 function App() {
   return (
@@ -57,6 +59,8 @@ function App() {
                   <Route path="/admin/products/add" element={<AdminRoute><AddProductPage /></AdminRoute>} />
                   <Route path="/admin/products/edit/:id" element={<AdminRoute><EditProductPage /></AdminRoute>} />
                   <Route path="/admin/orders" element={<AdminRoute><ManageOrdersPage /></AdminRoute>} />
+                  <Route path="/admin/users" element={<AdminRoute><ManageUsersPage /></AdminRoute>} />
+                  <Route path="/admin/coupons" element={<AdminRoute><ManageCouponsPage /></AdminRoute>} />
                 </Routes>
               </main>
               <Footer />

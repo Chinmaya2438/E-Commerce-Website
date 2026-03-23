@@ -99,7 +99,7 @@ const DashboardPage = () => {
       </div>
 
       {/* Quick Links */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-10">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4 mb-10">
         <Link to="/admin/products/add" className="card p-4 text-center hover:border-primary-200 group">
           <span className="text-2xl mb-2 block">➕</span>
           <span className="text-sm font-medium text-dark-700 group-hover:text-primary-600">Add Product</span>
@@ -111,6 +111,14 @@ const DashboardPage = () => {
         <Link to="/admin/orders" className="card p-4 text-center hover:border-primary-200 group">
           <span className="text-2xl mb-2 block">📋</span>
           <span className="text-sm font-medium text-dark-700 group-hover:text-primary-600">Manage Orders</span>
+        </Link>
+        <Link to="/admin/users" className="card p-4 text-center hover:border-primary-200 group">
+          <span className="text-2xl mb-2 block">👥</span>
+          <span className="text-sm font-medium text-dark-700 group-hover:text-primary-600">Manage Users</span>
+        </Link>
+        <Link to="/admin/coupons" className="card p-4 text-center hover:border-primary-200 group">
+          <span className="text-2xl mb-2 block">🎟️</span>
+          <span className="text-sm font-medium text-dark-700 group-hover:text-primary-600">Coupons</span>
         </Link>
         <Link to="/" className="card p-4 text-center hover:border-primary-200 group">
           <span className="text-2xl mb-2 block">🏠</span>

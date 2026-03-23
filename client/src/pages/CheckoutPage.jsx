@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
-import { createOrder, createStripeSession } from "../services/api";
+import { createOrder, createStripeSession, applyCoupon } from "../services/api";
 import toast from "react-hot-toast";
 import { HiOutlineTruck } from "react-icons/hi";
 
@@ -9,6 +9,9 @@ const CheckoutPage = () => {
   const { cart, cartTotal, clearCartLocal } = useCart();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [couponCode, setCouponCode] = useState("");
+  const [applyingCoupon, setApplyingCoupon] = useState(false);
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [form, setForm] = useState({
     fullName: "",
     address: "",
@@ -22,13 +25,43 @@ const CheckoutPage = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  const handleApplyCoupon = async () => {
+    if (!couponCode) return;
+    setApplyingCoupon(true);
+    try {
+      const { data } = await applyCoupon({ code: couponCode });
+      setAppliedCoupon(data);
+      toast.success("Coupon applied successfully!");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Invalid or expired coupon");
+      setAppliedCoupon(null);
+    } finally {
+      setApplyingCoupon(false);
+    }
+  };
+
+  const getFinalTotal = () => {
+    let total = cartTotal;
+    if (appliedCoupon) {
+      if (appliedCoupon.discountType === "percentage") {
+        total = total - (total * appliedCoupon.discountValue) / 100;
+      } else {
+        total = Math.max(0, total - appliedCoupon.discountValue);
+      }
+    }
+    return total;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     
     try {
       // Step 1: Create our internal DB Order flagged as unpaid
-      const { data: dbOrder } = await createOrder({ shippingAddress: form });
+      const { data: dbOrder } = await createOrder({ 
+        shippingAddress: form,
+        couponCode: appliedCoupon?.code
+      });
 
       // Step 2: Simulate Payment Gateway Loading Overlay Delay
       toast.loading("Connecting to Mock Payment Gateway...", { duration: 1500 });
@@ -205,9 +238,55 @@ const CheckoutPage = () => {
                 <span>Shipping</span>
                 <span className="text-emerald-600">Free</span>
               </div>
-              <div className="border-t border-dark-100 pt-2 flex justify-between text-base font-bold text-dark-900">
+
+              {/* Coupon Section */}
+              <div className="pt-2">
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="Discount code"
+                    value={couponCode}
+                    onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                    className="input-field py-2 text-sm"
+                    disabled={appliedCoupon !== null}
+                  />
+                  {appliedCoupon ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAppliedCoupon(null);
+                        setCouponCode("");
+                      }}
+                      className="px-3 py-2 bg-red-100 text-red-600 rounded-lg text-sm font-semibold"
+                    >
+                      Remove
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleApplyCoupon}
+                      disabled={applyingCoupon || !couponCode}
+                      className="px-4 py-2 bg-dark-900 text-white rounded-lg text-sm font-semibold hover:bg-dark-800 disabled:opacity-50"
+                    >
+                      Apply
+                    </button>
+                  )}
+                </div>
+                {appliedCoupon && (
+                  <div className="flex justify-between text-emerald-600 mt-2 font-medium">
+                    <span>Discount ({appliedCoupon.code})</span>
+                    <span>
+                      -₹{appliedCoupon.discountType === "percentage" 
+                        ? ((cartTotal * appliedCoupon.discountValue) / 100).toLocaleString() 
+                        : appliedCoupon.discountValue.toLocaleString()}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <div className="border-t border-dark-100 pt-3 flex justify-between text-base font-bold text-dark-900">
                 <span>Total</span>
-                <span>₹{cartTotal.toLocaleString()}</span>
+                <span>₹{getFinalTotal().toLocaleString()}</span>
               </div>
             </div>
             <button
