@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
 import { createOrder, createStripeSession, applyCoupon } from "../services/api";
 import toast from "react-hot-toast";
 import { HiOutlineTruck } from "react-icons/hi";
@@ -12,6 +13,8 @@ const CheckoutPage = () => {
   const [couponCode, setCouponCode] = useState("");
   const [applyingCoupon, setApplyingCoupon] = useState(false);
   const [appliedCoupon, setAppliedCoupon] = useState(null);
+  const { user } = useAuth();
+  const [selectedAddressId, setSelectedAddressId] = useState("");
   const [form, setForm] = useState({
     fullName: "",
     address: "",
@@ -23,6 +26,31 @@ const CheckoutPage = () => {
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  useEffect(() => {
+    if (user?.addresses?.length > 0) {
+      const defaultAddr = user.addresses.find((a) => a.isDefault) || user.addresses[0];
+      if (defaultAddr) {
+        setSelectedAddressId(defaultAddr._id);
+        const { fullName, address, city, state, zipCode, phone } = defaultAddr;
+        setForm({ fullName, address, city, state, zipCode, phone });
+      }
+    }
+  }, [user]);
+
+  const handleAddressSelect = (e) => {
+    const id = e.target.value;
+    setSelectedAddressId(id);
+    if (!id) {
+      setForm({ fullName: "", address: "", city: "", state: "", zipCode: "", phone: "" });
+      return;
+    }
+    const addr = user.addresses.find((a) => a._id === id);
+    if (addr) {
+      const { fullName, address, city, state, zipCode, phone } = addr;
+      setForm({ fullName, address, city, state, zipCode, phone });
+    }
   };
 
   const handleApplyCoupon = async () => {
@@ -106,6 +134,26 @@ const CheckoutPage = () => {
                 Shipping Information
               </h2>
             </div>
+
+            {user?.addresses?.length > 0 && (
+              <div className="mb-6 bg-dark-50 p-4 rounded-lg border border-dark-100">
+                <label className="block text-sm font-medium text-dark-700 mb-2">
+                  Quick Select Saved Address
+                </label>
+                <select 
+                  value={selectedAddressId} 
+                  onChange={handleAddressSelect}
+                  className="input-field py-2.5 text-sm cursor-pointer"
+                >
+                  <option value="">-- Enter a new custom address --</option>
+                  {user.addresses.map((addr) => (
+                    <option key={addr._id} value={addr._id}>
+                      {addr.title} - {addr.address}, {addr.city} {addr.isDefault ? "(Default)" : ""}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             <form onSubmit={handleSubmit} id="checkout-form" className="space-y-4">
               <div>

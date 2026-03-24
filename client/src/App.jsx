@@ -20,6 +20,7 @@ import CartPage from "./pages/CartPage";
 import CheckoutPage from "./pages/CheckoutPage";
 import OrdersPage from "./pages/OrdersPage";
 import WishlistPage from "./pages/WishlistPage";
+import ProfilePage from "./pages/ProfilePage";
 
 // Admin Pages
 import DashboardPage from "./pages/admin/DashboardPage";
@@ -50,6 +51,7 @@ function App() {
                   <Route path="/wishlist" element={<WishlistPage />} />
 
                   {/* Protected */}
+                  <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
                   <Route path="/cart" element={<ProtectedRoute><CartPage /></ProtectedRoute>} />
                   <Route path="/checkout" element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>} />
                   <Route path="/orders" element={<ProtectedRoute><OrdersPage /></ProtectedRoute>} />

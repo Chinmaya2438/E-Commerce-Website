@@ -20,10 +20,18 @@ API.interceptors.request.use((config) => {
 export const registerUser = (data) => API.post("/auth/register", data);
 export const loginUser = (data) => API.post("/auth/login", data);
 export const getProfile = () => API.get("/auth/profile");
+export const updateProfile = (data) => API.put("/auth/profile", data);
+export const changePassword = (data) => API.put("/auth/password", data);
 export const forgotPassword = (data) => API.post("/auth/forgot-password", data);
 export const resetPassword = (token, data) => API.put(`/auth/reset-password/${token}`, data);
 export const getAllUsers = () => API.get("/auth/users");
 export const deleteUser = (id) => API.delete(`/auth/users/${id}`);
+
+// Addresses
+export const addAddress = (data) => API.post("/auth/addresses", data);
+export const updateAddress = (id, data) => API.put(`/auth/addresses/${id}`, data);
+export const deleteAddress = (id) => API.delete(`/auth/addresses/${id}`);
+export const setDefaultAddress = (id) => API.put(`/auth/addresses/${id}/default`);
 
 // Products
 export const getProducts = (params) => API.get("/products", { params });

@@ -24,6 +24,22 @@ const userSchema = new mongoose.Schema(
     },
     resetPasswordToken: String,
     resetPasswordExpire: Date,
+    profilePicture: {
+      type: String,
+      default: "",
+    },
+    addresses: [
+      {
+        title: { type: String, required: true },
+        fullName: { type: String, required: true },
+        address: { type: String, required: true },
+        city: { type: String, required: true },
+        state: { type: String, required: true },
+        zipCode: { type: String, required: true },
+        phone: { type: String, required: true },
+        isDefault: { type: Boolean, default: false },
+      },
+    ],
     role: {
       type: String,
       enum: ["user", "admin"],

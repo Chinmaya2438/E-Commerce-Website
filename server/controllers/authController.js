@@ -79,6 +79,8 @@ export const getProfile = async (req, res) => {
       name: user.name,
       email: user.email,
       role: user.role,
+      profilePicture: user.profilePicture,
+      addresses: user.addresses,
       createdAt: user.createdAt,
     });
   } catch (error) {
@@ -192,6 +194,136 @@ export const deleteUser = async (req, res) => {
 
     await User.findByIdAndDelete(req.params.id);
     res.json({ message: "User deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// PUT /api/auth/profile
+export const updateProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    user.name = req.body.name || user.name;
+    if (req.body.profilePicture !== undefined) {
+      user.profilePicture = req.body.profilePicture;
+    }
+
+    const updatedUser = await user.save();
+    res.json({
+      _id: updatedUser._id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      profilePicture: updatedUser.profilePicture,
+      role: updatedUser.role,
+      addresses: updatedUser.addresses,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// PUT /api/auth/password
+export const changePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const user = await User.findById(req.user._id).select("+password");
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const isMatch = await user.comparePassword(currentPassword);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Incorrect current password" });
+    }
+
+    user.password = newPassword;
+    await user.save();
+    res.json({ message: "Password updated successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// POST /api/auth/addresses
+export const addAddress = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const newAddress = req.body;
+
+    if (newAddress.isDefault || user.addresses.length === 0) {
+      user.addresses.forEach(a => a.isDefault = false);
+      newAddress.isDefault = true;
+    }
+
+    user.addresses.push(newAddress);
+    await user.save();
+    res.status(201).json(user.addresses);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// PUT /api/auth/addresses/:id
+export const updateAddress = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const address = user.addresses.id(req.params.id);
+    if (!address) return res.status(404).json({ message: "Address not found" });
+
+    Object.assign(address, req.body);
+
+    if (req.body.isDefault) {
+      user.addresses.forEach(a => {
+        if (a._id.toString() !== req.params.id) a.isDefault = false;
+      });
+    }
+
+    await user.save();
+    res.json(user.addresses);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// DELETE /api/auth/addresses/:id
+export const deleteAddress = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    user.addresses = user.addresses.filter(a => a._id.toString() !== req.params.id);
+    
+    // If deleted the default, make the first one default (if exists)
+    if (user.addresses.length > 0 && !user.addresses.some(a => a.isDefault)) {
+      user.addresses[0].isDefault = true;
+    }
+
+    await user.save();
+    res.json(user.addresses);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// PUT /api/auth/addresses/:id/default
+export const setDefaultAddress = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const address = user.addresses.id(req.params.id);
+    if (!address) return res.status(404).json({ message: "Address not found" });
+
+    user.addresses.forEach(a => a.isDefault = false);
+    address.isDefault = true;
+
+    await user.save();
+    res.json(user.addresses);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

@@ -118,23 +118,9 @@ const OrdersPage = () => {
                   </div>
                   <div>
                     <span className="text-dark-500 block">Total</span>
-                    {order.discountAmount > 0 ? (
-                      <>
-                        <span className="text-xs text-dark-400 line-through block">
-                          ₹{(order.totalPrice + order.discountAmount).toLocaleString()}
-                        </span>
-                        <span className="text-xs text-emerald-600 block font-medium">
-                          -₹{order.discountAmount.toLocaleString()} ({order.couponCode})
-                        </span>
-                        <span className="font-bold text-dark-900">
-                          ₹{order.totalPrice?.toLocaleString()}
-                        </span>
-                      </>
-                    ) : (
-                      <span className="font-bold text-dark-900">
-                        ₹{order.totalPrice?.toLocaleString()}
-                      </span>
-                    )}
+                    <span className="font-bold text-dark-900">
+                      ₹{order.totalPrice?.toLocaleString()}
+                    </span>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
@@ -187,6 +173,26 @@ const OrdersPage = () => {
                     </span>
                   </Link>
                 ))}
+              </div>
+
+              {/* Order Summary */}
+              <div className="px-6 py-4 border-t border-dark-100 bg-dark-50 flex justify-end">
+                <div className="w-full sm:w-64 space-y-2">
+                  <div className="flex justify-between text-dark-600 text-sm">
+                    <span>Subtotal:</span>
+                    <span>₹{(order.totalPrice + (order.discountAmount || 0)).toLocaleString()}</span>
+                  </div>
+                  {order.discountAmount > 0 && (
+                    <div className="flex justify-between text-emerald-600 text-sm font-medium">
+                      <span>Discount ({order.couponCode}):</span>
+                      <span>-₹{order.discountAmount.toLocaleString()}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between text-dark-900 font-bold text-lg border-t border-dark-200 pt-2 mt-2">
+                    <span>Total:</span>
+                    <span>₹{order.totalPrice?.toLocaleString()}</span>
+                  </div>
+                </div>
               </div>
 
               {/* Shipping */}

@@ -114,6 +114,14 @@ const Navbar = () => {
                         </p>
                         <p className="text-xs text-dark-500">{user.email}</p>
                       </div>
+                      <Link
+                        to="/profile"
+                        onClick={() => setUserMenuOpen(false)}
+                        className="flex items-center px-4 py-2 text-sm text-dark-700 hover:bg-dark-50 transition-colors"
+                      >
+                        <HiOutlineUser className="w-4 h-4 mr-2" />
+                        My Profile
+                      </Link>
                       {!isAdmin && (
                         <Link
                           to="/orders"
