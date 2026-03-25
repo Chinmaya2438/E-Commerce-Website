@@ -95,8 +95,8 @@ const CheckoutPage = () => {
       toast.loading("Redirecting to Stripe...", { id: "stripe-redirect" });
       const { data: session } = await createCheckoutSession({ orderId: dbOrder._id });
 
-      // Step 3: Clear cart locally and redirect to Stripe's hosted checkout
-      clearCartLocal();
+      // Step 3: Redirect to Stripe's hosted checkout page
+      // Cart will be cleared after successful payment verification on OrdersPage
       window.location.href = session.url;
       
     } catch (error) {

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { getMyOrders, cancelOrder, verifyStripeSession, getInvoice } from "../services/api";
+import { useCart } from "../context/CartContext";
 import LoadingSpinner from "../components/LoadingSpinner";
 import toast from "react-hot-toast";
 import { HiOutlineClipboardList } from "react-icons/hi";
@@ -9,6 +10,7 @@ const OrdersPage = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const hasVerified = useRef(false);
+  const { clearCartLocal } = useCart();
 
   const [searchParams] = useSearchParams();
 
@@ -34,6 +36,8 @@ const OrdersPage = () => {
           toast.loading("Verifying your payment...", { id: "verify" });
           await verifyStripeSession({ session_id: sessionId, orderId });
           toast.success("Payment verified! Your order is confirmed.", { id: "verify" });
+          // Clear cart only after successful payment
+          clearCartLocal();
         } catch (error) {
           console.error("Verification error:", error);
           toast.error("Payment verification issue. Your order may still be processing.", { id: "verify" });
