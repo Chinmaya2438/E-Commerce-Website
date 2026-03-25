@@ -1,7 +1,7 @@
 # 🛒 Full Stack E-Commerce Website
 
-A production-ready full-stack E-Commerce platform built using React, Node.js, Express, and MongoDB.
-This project includes authentication, admin dashboard, product management, cart system, and order processing.
+A **production-ready full-stack E-Commerce platform** built using **React, Node.js, Express, and MongoDB**.
+This project includes authentication, admin dashboard, Stripe payments, coupons, wishlist, invoices, address book, and advanced security.
 
 ---
 
@@ -25,43 +25,107 @@ This project includes authentication, admin dashboard, product management, cart 
 * bcrypt
 * Multer
 * Cloudinary
+* Stripe
 
 ---
 
 # ✨ Features
 
-## Authentication
+## 🔐 Authentication
 
-* User Signup & Login
-* JWT-based Authentication
-* Protected Routes
+* Register & Login
+* Forgot / Reset Password (Email Link)
+* JWT Authentication
 * Role-based Access (Admin / User)
-* Password Hashing
+* bcrypt Password Hashing
 
-## User Features
+## 🛍️ Products
 
 * Browse Products
 * Product Search
-* Filter by Category
-* Sort by Price
-* Product Details Page
+* Category Filter
+* Price Range Slider with Histogram
+* Sort by Price / Date
+* Product Detail Pages
+* Image Upload via Cloudinary
+
+## 🛒 Cart
+
 * Add to Cart
 * Remove from Cart
 * Update Quantity
-* Checkout
+* Persistent DB-backed Cart
+
+## ❤️ Wishlist
+
+* Add to Wishlist
+* Remove from Wishlist
+* Wishlist Page
+
+## 💳 Stripe Payment
+
+* Stripe Checkout Sessions
+* Secure Redirect Flow
+* Payment Verification
+* Test Card Support (4242...)
+
+## 📦 Orders
+
 * Place Orders
 * Order History
+* Cancel Pending Orders
+* Order Status Tracking
+  (Pending / Shipped / Delivered / Cancelled)
 
-## Admin Features
+## 🧾 Invoices
 
-* Admin Dashboard
-* Add Product
-* Edit Product
-* Delete Product
-* Upload Product Images
-* Manage Categories
-* View Orders
+* Download PDF Invoice
+* Generated per order
+
+## 🎟️ Coupons
+
+* Admin Created Coupons
+* Percentage or Flat Discount
+* Apply at Checkout
+* Discount in Order Summary
+
+## 👤 User Profile
+
+* Edit Profile
+* Profile Picture Upload
+* Change Password
+* Multi Address Book
+
+## 📍 Address Book
+
+* Multiple Shipping Addresses
+* Default Address
+* Quick Checkout Selection
+* Auto Fill Address
+
+## 🛡️ Admin Dashboard
+
+* Manage Products (CRUD)
+* Manage Orders
 * Update Order Status
+* Manage Users
+* Manage Coupons
+
+## 🔒 Security
+
+* Helmet
+* Rate Limiting
+* Mongo Sanitization
+* CORS Whitelist
+* bcrypt Hashing
+
+## 🎨 UI/UX
+
+* Responsive Design
+* Animations
+* Glassmorphism Navbar
+* Toast Notifications
+* Loading Spinners
 
 ---
 
@@ -99,7 +163,10 @@ E-Commerce-Website/
 * User
 * Product
 * Cart
+* Wishlist
 * Order
+* Coupon
+* Address
 
 ---
 
@@ -107,44 +174,74 @@ E-Commerce-Website/
 
 ## Auth
 
+```
 POST /api/auth/register
 POST /api/auth/login
-GET /api/auth/profile
+POST /api/auth/forgot-password
+POST /api/auth/reset-password
+GET  /api/auth/profile
+```
 
 ## Products
 
-GET /api/products
-GET /api/products/:id
-POST /api/products (admin)
-PUT /api/products/:id (admin)
+```
+GET    /api/products
+GET    /api/products/:id
+POST   /api/products (admin)
+PUT    /api/products/:id (admin)
 DELETE /api/products/:id (admin)
+```
 
 ## Cart
 
-GET /api/cart
-POST /api/cart
-PUT /api/cart/:id
+```
+GET    /api/cart
+POST   /api/cart
+PUT    /api/cart/:id
 DELETE /api/cart/:id
+```
+
+## Wishlist
+
+```
+GET    /api/wishlist
+POST   /api/wishlist
+DELETE /api/wishlist/:id
+```
 
 ## Orders
 
+```
 POST /api/orders
-GET /api/orders
-GET /api/orders/my
-PUT /api/orders/:id (admin)
+GET  /api/orders
+GET  /api/orders/my
+PUT  /api/orders/:id (admin)
+```
+
+## Coupons
+
+```
+POST   /api/coupons (admin)
+GET    /api/coupons
+DELETE /api/coupons/:id (admin)
+```
 
 ---
 
 # ⚙️ Environment Variables
 
-Create `.env` in server folder:
+Create `.env` inside `server` folder:
 
 ```
 MONGO_URI=your_mongodb_connection
 JWT_SECRET=your_jwt_secret
+
 CLOUDINARY_NAME=your_cloudinary_name
 CLOUDINARY_KEY=your_cloudinary_key
 CLOUDINARY_SECRET=your_cloudinary_secret
+
+STRIPE_SECRET_KEY=your_stripe_secret
+CLIENT_URL=http://localhost:5173
 ```
 
 ---
@@ -191,21 +288,13 @@ npm run dev
 # 🔄 Order Flow
 
 1. User adds products to cart
-2. User proceeds to checkout
-3. User enters shipping details
-4. Order stored in database
-5. Cart cleared after order
-
----
-
-# 🎨 UI Features
-
-* Responsive design
-* Modern layout
-* Navbar with cart count
-* Loading spinners
-* Error handling
-* Toast notifications
+2. User selects address
+3. User applies coupon (optional)
+4. Stripe Checkout session created
+5. Payment completed
+6. Order saved in database
+7. Invoice generated
+8. Cart cleared
 
 ---
 
@@ -213,7 +302,9 @@ npm run dev
 
 * authMiddleware
 * adminMiddleware
+* rateLimiter
 * errorHandler
+* mongoSanitize
 
 ---
 
@@ -222,22 +313,14 @@ npm run dev
 Frontend: Vercel
 Backend: Render
 Database: MongoDB Atlas
-
----
-
-# 📌 Future Improvements
-
-* Wishlist feature
-* Payment gateway integration
-* Product reviews & ratings
-* Pagination
-* Email notifications
+Images: Cloudinary
+Payments: Stripe
 
 ---
 
 # 👨‍💻 Author
 
-Chinmaya Panda
+**Chinmaya Panda**
 
 ---
 
