@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
-import { createOrder, createStripeSession, applyCoupon } from "../services/api";
+import { createOrder, createCheckoutSession, applyCoupon } from "../services/api";
 import toast from "react-hot-toast";
 import { HiOutlineTruck } from "react-icons/hi";
 
@@ -91,25 +91,30 @@ const CheckoutPage = () => {
         couponCode: appliedCoupon?.code
       });
 
-      // Step 2: Simulate Payment Gateway Loading Overlay Delay
-      toast.loading("Connecting to Mock Payment Gateway...", { duration: 1500 });
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      
-      // Step 3: Send Secure Mock Transaction ID
-      toast.loading("Processing Mock Transaction...", { duration: 1500 });
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      // Step 2: Create a Stripe Checkout Session via our backend
+      toast.loading("Redirecting to Stripe...", { id: "stripe-redirect" });
+      const { data: session } = await createCheckoutSession({ orderId: dbOrder._id });
 
-      const mock_transaction_id = "mock_tx_" + Math.random().toString(36).substr(2, 9);
-      
-      // Step 4: Clear cart and redirect browser with simulated Stripe webhook params!
+      // Step 3: Clear cart locally and redirect to Stripe's hosted checkout
       clearCartLocal();
-      window.location.href = `/orders?session_id=${mock_transaction_id}&order_id=${dbOrder._id}`;
+      window.location.href = session.url;
       
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to initialize payment gateway");
+      toast.dismiss("stripe-redirect");
+      toast.error(error.response?.data?.message || "Failed to initialize payment");
       setLoading(false);
     }
   };
+
+  // Detect if user was redirected back from a cancelled Stripe checkout
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("cancelled") === "true") {
+      toast.error("Payment was cancelled. You can try again.");
+      // Clean the URL
+      window.history.replaceState({}, document.title, "/checkout");
+    }
+  }, []);
 
   if (!cart.items || cart.items.length === 0) {
     navigate("/cart");
@@ -343,7 +348,7 @@ const CheckoutPage = () => {
               disabled={loading}
               className="w-full btn-primary py-3 mt-6 shadow-md hover:shadow-lg flex items-center justify-center gap-2"
             >
-              {loading ? "Processing Securely..." : "Simulate Secure Payment"}
+              {loading ? "Redirecting to Stripe..." : "Pay Now with Stripe 💳"}
             </button>
           </div>
         </div>

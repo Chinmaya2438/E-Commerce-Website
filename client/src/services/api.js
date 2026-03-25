@@ -63,7 +63,7 @@ export const cancelOrder = (id) => API.put(`/orders/${id}/cancel`);
 export const getInvoice = (id) => API.get(`/orders/${id}/invoice`, { responseType: "blob" });
 
 // Payment
-export const createStripeSession = (data) => API.post("/payment/create-session", data);
+export const createCheckoutSession = (data) => API.post("/payment/create-checkout-session", data);
 export const verifyStripeSession = (data) => API.post("/payment/verify-session", data);
 
 // Coupons

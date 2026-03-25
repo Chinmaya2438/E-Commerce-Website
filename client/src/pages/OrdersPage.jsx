@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { getMyOrders, cancelOrder, verifyStripeSession, getInvoice } from "../services/api";
 import LoadingSpinner from "../components/LoadingSpinner";
@@ -8,8 +8,9 @@ import { HiOutlineClipboardList } from "react-icons/hi";
 const OrdersPage = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const hasVerified = useRef(false);
 
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
 
   const fetchOrders = async () => {
     try {
@@ -26,25 +27,28 @@ const OrdersPage = () => {
     const sessionId = searchParams.get("session_id");
     const orderId = searchParams.get("order_id");
 
-    if (sessionId && orderId) {
+    if (sessionId && orderId && !hasVerified.current) {
+      hasVerified.current = true;
       const verifyPayment = async () => {
         try {
-          toast.loading("Verifying your secure payment...", { id: "verify" });
+          toast.loading("Verifying your payment...", { id: "verify" });
           await verifyStripeSession({ session_id: sessionId, orderId });
-          toast.success("Payment verified successfully! Your order is confirmed.", { id: "verify" });
+          toast.success("Payment verified! Your order is confirmed.", { id: "verify" });
         } catch (error) {
-          toast.error("Payment verification failed or was incomplete.", { id: "verify" });
+          console.error("Verification error:", error);
+          toast.error("Payment verification issue. Your order may still be processing.", { id: "verify" });
         } finally {
-          setSearchParams({}); // Clean URL params so it doesn't re-trigger
+          // Clean URL without causing re-renders
+          window.history.replaceState({}, document.title, "/orders");
           fetchOrders();
         }
       };
       verifyPayment();
-    } else {
+    } else if (!sessionId) {
       fetchOrders();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams]);
+  }, []);
 
   const handleCancelOrder = async (orderId) => {
     try {
