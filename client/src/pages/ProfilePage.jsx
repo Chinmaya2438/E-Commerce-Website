@@ -14,6 +14,16 @@ import {
   HiOutlineCheckCircle
 } from "react-icons/hi";
 
+const INDIAN_STATES = [
+  "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
+  "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka",
+  "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram",
+  "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu",
+  "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal",
+  "Andaman and Nicobar Islands", "Chandigarh", "Dadra and Nagar Haveli and Daman and Diu",
+  "Delhi", "Jammu and Kashmir", "Ladakh", "Lakshadweep", "Puducherry"
+];
+
 const ProfilePage = () => {
   const { user, setUser } = useAuth(); 
   const [activeTab, setActiveTab] = useState("details");
@@ -422,7 +432,17 @@ const AddressBook = ({ user, setUser }) => {
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-dark-700 mb-1">State</label>
-                  <input type="text" value={formData.state} onChange={e => setFormData({...formData, state: e.target.value})} required className="input-field py-2 text-sm" />
+                  <select 
+                    value={formData.state} 
+                    onChange={e => setFormData({...formData, state: e.target.value})} 
+                    required 
+                    className="input-field py-2 text-sm cursor-pointer"
+                  >
+                    <option value="">Choose a state</option>
+                    {INDIAN_STATES.map((s) => (
+                      <option key={s} value={s}>{s}</option>
+                    ))}
+                  </select>
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-dark-700 mb-1">Zip Code</label>
